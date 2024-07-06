@@ -1,13 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from shortuuid.django_fields import ShortUUIDField
+from django.utils import timezone
 from django.db.models.signals import post_save
+from django.utils.html import mark_safe
+from shortuuid.django_fields import ShortUUIDField
+# from addon.models import Tax
+
+import os
+import uuid
+
 GENDER = (
     ("female", "Female"),
     ("male", "Male"),
 )
 
 
+
+def user_directory_path(instance, filename):
+    user = None
+    
+    if hasattr(instance, 'user') and instance.user:
+        user = instance.user
+    elif hasattr(instance, 'vendor') and hasattr(instance.vendor, 'user') and instance.vendor.user:
+        user = instance.vendor.user
+    elif hasattr(instance, 'product') and hasattr(instance.product.vendor, 'user') and instance.product.vendor.user:
+        user = instance.product.vendor.user
+
+    if user:
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (user.id, ext)
+        return 'user_{0}/{1}'.format(user.id, filename)
+    else:
+        # Handle the case when user is None
+        # You can return a default path or raise an exception, depending on your requirements.
+        # For example, return a path with 'unknown_user' as the user ID:
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % ('file', ext)
+        return 'user_{0}/{1}'.format('file', filename)
+    
+
+    
 class User(AbstractUser):
     username = models.CharField(max_length=500, null=True, blank=True)
     email = models.EmailField(unique=True)
@@ -68,6 +100,11 @@ class Profile(models.Model):
         
         super(Profile, self).save(*args, **kwargs)
 
+
+    def thumbnail(self):
+        return mark_safe('<img src="/media/%s" width="50" height="50" object-fit:"cover" style="border-radius: 30px; object-fit: cover;" />' % (self.image))
+    
+    
 def create_user_profile(sender, instance, created, **kwargs):
 	if created:
 		Profile.objects.create(user=instance)
