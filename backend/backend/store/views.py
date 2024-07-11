@@ -663,3 +663,5 @@ class SearchProductsAPIView(generics.ListAPIView):
         products = Product.objects.filter(status="published", title__icontains=query)
         return products
        
+
+ 

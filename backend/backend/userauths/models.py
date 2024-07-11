@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
-# from addon.models import Tax
+from addon.models import Tax
 
 import os
 import uuid

@@ -1,10 +1,66 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import apiInstance from '../../store/axios'
+import GetCurrentAddress from '../plugin/UserCountry'
+import UserData from '../plugin/UseData'
+import CartID from '../plugin/CartID'
+
+
+
 function ProductDetail() {
 
     const [product, setProduct] = useState({})
-    const [specifications, Setspecifications] = useState({})
+    const [specifications, Setspecifications] = useState([])
+    const [gallery, Setgallery] = useState([])
+    const [color, Setcolor] =  useState([])
+    const [size, Setsize] = useState([])
+    const [colorValue, SetcolorValue] = useState("No color")
+    const [sizeValue, SetsizeValue] = useState("No size")
+    const [QtyValue, SetQtyValue] = useState(1)
+    const card_id = CartID()
+
+    console.log('card_id', card_id)
+    const userData = UserData()
+    console.log(userData.user_id)
+    
+    const currentAddress = GetCurrentAddress()
+    // console.log(currentAddress)
+
+    const HandleButtonClick = (e) => {
+        e.preventDefault()
+        const ColorNameInput = e.target.closest(".color_button").parentNode.querySelector(".color_name")
+        console.log("clicked", ColorNameInput.value)
+        SetcolorValue(ColorNameInput.value)
+    }
+    
+    const HandleButtonClickSize = (e)=>{
+        e.preventDefault()
+        const SizeNameInput = e.target.closest(".size_button").parentNode.querySelector(".size_name")
+        console.log(SizeNameInput.value)
+        SetsizeValue(SizeNameInput.value)
+
+    }
+
+    const HandleQyt = (e)=> {
+        e.preventDefault()
+        SetQtyValue(e.target.value)
+        console.log(QtyValue)
+        
+    }
+
+    const HandleAddToCard = ()=> {
+        console.log("Product", product.id)
+        console.log("Product price", product.price)
+        console.log("Product shipping", product.shipping_amount)
+        console.log("sizeValue", sizeValue)
+        console.log("color", colorValue)
+        console.log("QtyValue", QtyValue)
+        console.log("Country", currentAddress.country)
+        console.log("user data", userData.user_id)
+        console.log("cardID", card_id)
+        
+    }
+
 
     const params = useParams()
 
@@ -14,7 +70,10 @@ function ProductDetail() {
             console.log(res.data)
             setProduct(res.data)
             Setspecifications(res.data.specification)
-            
+            Setgallery(res.data.gallery)
+            Setcolor(res.data.color)
+            Setsize(res.data.size)
+             
         })
         
     }, []) 
@@ -49,9 +108,10 @@ function ProductDetail() {
                             </div>
                         </div>
                         <div className="mt-3 d-flex">
-                            <div className="p-3">
+                         {gallery?.map((s, index)=>(
+                            <div className="p-3" key={index} >
                                 <img
-                                    src="https://mdbootstrap.com/img/Photos/Slides/1.jpg"
+                                    src={s.image}
                                     style={{
                                         width: 100,
                                         height: 100,
@@ -62,45 +122,7 @@ function ProductDetail() {
                                     className="ecommerce-gallery-main-img active w-100 rounded-4"
                                 />
                             </div>
-                            <div className="p-3">
-                                <img
-                                    src="https://mdbootstrap.com/img/Photos/Slides/1.jpg"
-                                    style={{
-                                        width: 100,
-                                        height: 100,
-                                        objectFit: "cover",
-                                        borderRadius: 10
-                                    }}
-                                    alt="Gallery image 1"
-                                    className="ecommerce-gallery-main-img active w-100 rounded-4"
-                                />
-                            </div>
-                            <div className="p-3">
-                                <img
-                                    src="https://mdbootstrap.com/img/Photos/Slides/1.jpg"
-                                    style={{
-                                        width: 100,
-                                        height: 100,
-                                        objectFit: "cover",
-                                        borderRadius: 10
-                                    }}
-                                    alt="Gallery image 1"
-                                    className="ecommerce-gallery-main-img active w-100 rounded-4"
-                                />
-                            </div>
-                            <div className="p-3">
-                                <img
-                                    src="https://mdbootstrap.com/img/Photos/Slides/1.jpg"
-                                    style={{
-                                        width: 100,
-                                        height: 100,
-                                        objectFit: "cover",
-                                        borderRadius: 10
-                                    }}
-                                    alt="Gallery image 1"
-                                    className="ecommerce-gallery-main-img active w-100 rounded-4"
-                                />
-                            </div>
+                         ))}
                         </div>
                     </div>
                     {/* Gallery */}
@@ -143,10 +165,10 @@ function ProductDetail() {
                                         <td>{product?.category?.title}</td>
 
                                     </tr>
-                                    {specifications.map((s, index)=>(
+                                    {specifications?.map((s, ind)=>(
 
                                     <tr>
-                                    <th className="ps-0 w-25" scope="row">
+                                    <th className="ps-0 w-25" scope="row" key={ind} >
                                         <strong>{s.title}</strong>
                                     </th>
                                     <td>{s.content}</td>
@@ -170,60 +192,59 @@ function ProductDetail() {
                                             id="typeNumber"
                                             className="form-control quantity"
                                             min={1}
-                                            value={1}
+                                            value={QtyValue}
+                                            onChange={HandleQyt}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Size */}
+
+                                {size.length > 0 && 
+                                <>
+                                
                                 <div className="col-md-6 mb-4">
                                     <div className="form-outline">
-                                        <label className="form-label" htmlFor="typeNumber"><b>Size:</b> XS</label>
+                                        <label className="form-label" htmlFor="typeNumber"><b>Size:</b> {sizeValue}</label>
                                     </div>
                                     <div className='d-flex'>
-                                        <div key={1} className='me-2'>
-                                            <input type="hidden" className='size_name' value={"XS"} />
-                                            <button className='btn btn-secondary size_button'>XS</button>
+                                        {size?.map((size, index)=>(
+                                        <div key={index} className='me-2'>
+                                            <input type="hidden" className='size_name' value={size.name} />
+                                            <button className='btn btn-secondary size_button' onClick={HandleButtonClickSize}>{size.name}</button>
                                         </div>
-                                        <div key={1} className='me-2'>
-                                            <input type="hidden" className='size_name' value={"XXL"} />
-                                            <button className='btn btn-secondary size_button'>XXL</button>
-                                        </div>
-                                        <div key={1} className='me-2'>
-                                            <input type="hidden" className='size_name' value={"XL"} />
-                                            <button className='btn btn-secondary size_button'>XL</button>
-                                        </div>
+                                        ))}
                                     </div>
+                                        
                                 </div>
-
+                                
+                                </>
+                                }
                                 {/* Colors */}
 
+                                {color.length > 0 && 
+                                <>
+
                                 <div className="col-md-6 mb-4">
                                     <div className="form-outline">
-                                        <label className="form-label" htmlFor="typeNumber"><b>Color:</b> <span>Red</span></label>
+                                        <label className="form-label" htmlFor="typeNumber"><b>Color:</b> <span>{colorValue}</span></label>
                                     </div>
                                     <div className='d-flex'>
-                                        <div key={1}>
-                                            <input type="hidden" className='color_name' value={1} />
-                                            <input type="hidden" className='color_image' value={1} />
-                                            <button className='btn p-3 me-2 color_button' style={{ background: "red" }}></button>
+                                        {color?.map((c, index)=>(
+                                        <div key={index}>
+                                            <input type="hidden" className='color_name' value={c.name} />
+                                            <input type="hidden" className='color_image' value={c.name} />
+                                            <button className='btn p-3 me-2 color_button' onClick={HandleButtonClick} style={{backgroundColor: `${c.color_code}`}}></button>
                                         </div>
-                                        <div key={1}>
-                                            <input type="hidden" className='color_name' value={1} />
-                                            <input type="hidden" className='color_image' value={1} />
-                                            <button className='btn p-3 me-2 color_button' style={{ background: "yellow" }}></button>
-                                        </div>
-                                        <div key={1}>
-                                            <input type="hidden" className='color_name' value={1} />
-                                            <input type="hidden" className='color_image' value={1} />
-                                            <button className='btn p-3 me-2 color_button' style={{ background: "green" }}></button>
-                                        </div>
+                                        ))}
                                     </div>
                                     <hr />
                                 </div>
+                                </>
+                                }
 
                             </div>
-                            <button type="button" className="btn btn-primary btn-rounded me-2">
+                            <button type="button" className="btn btn-primary btn-rounded me-2" onClick={HandleAddToCard}>
                                 <i className="fas fa-cart-plus me-2" /> Add to cart
                             </button>
                             <button href="#!" type="button" className="btn btn-danger btn-floating" data-mdb-toggle="tooltip" title="Add to wishlist">
@@ -263,55 +284,15 @@ function ProductDetail() {
                 <div className="table-responsive">
                     <table className="table table-sm table-borderless mb-0">
                         <tbody>
+                             {specifications?.map((s, index)=>(
                             <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Category</strong>
+                                <th className="ps-0 w-25" scope="row" key={index}>
+                                   
+                                    <strong>{s.title}</strong>
                                 </th>
-                                <td>Technologes</td>
+                                <td>{s.content}</td>
                             </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Vat</strong>
-                                </th>
-                                <td>$1.9</td>
-                            </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Model</strong>
-                                </th>
-                                <td>Shirt 5407X</td>
-                            </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Material</strong>
-                                </th>
-                                <td>Cotton 80%</td>
-                            </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Colors</strong>
-                                </th>
-                                <td>Green, Yellow</td>
-                            </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Size</strong>
-                                </th>
-                                <td>XL, ML, SSL</td>
-                            </tr>
-                            <tr>
-                                <th className="ps-0 w-25" scope="row">
-                                    {" "}
-                                    <strong>Delivery</strong>
-                                </th>
-                                <td>USA, Europe</td>
-                            </tr>
+                                    ))}
                         </tbody>
                     </table>
                 </div>

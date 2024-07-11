@@ -30,6 +30,7 @@ function App() {
 
           <Route path='/' element={<Products />} />
           <Route path='/detail/:slug' element={<ProductDetail />} />
+
         </Routes>
       </MainWrapper>
       <StoreFooter />
