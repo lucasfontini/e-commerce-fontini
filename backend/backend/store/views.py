@@ -107,6 +107,7 @@ class CartApiView(generics.ListCreateAPIView):
         color = payload['color']
         cart_id = payload['cart_id']
         
+        print(payload)
         product = Product.objects.filter(status="published", id=product_id).first()
         if user_id != "undefined":
             user = User.objects.filter(id=user_id).first()
@@ -162,7 +163,7 @@ class CartApiView(generics.ListCreateAPIView):
             cart.cart_id = cart_id
 
             config_settings = ConfigSettings.objects.first()
-
+            
             if config_settings.service_fee_charge_type == "percentage":
                 service_fee_percentage = config_settings.service_fee_percentage / 100 
                 cart.service_fee = Decimal(service_fee_percentage) * cart.sub_total

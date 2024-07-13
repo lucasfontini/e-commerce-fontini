@@ -4,6 +4,7 @@ import apiInstance from '../../store/axios'
 import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UseData'
 import CartID from '../plugin/CartID'
+import axios from 'axios'
 
 
 
@@ -48,19 +49,40 @@ function ProductDetail() {
         
     }
 
-    const HandleAddToCard = ()=> {
-        console.log("Product", product.id)
-        console.log("Product price", product.price)
-        console.log("Product shipping", product.shipping_amount)
-        console.log("sizeValue", sizeValue)
-        console.log("color", colorValue)
-        console.log("QtyValue", QtyValue)
-        console.log("Country", currentAddress.country)
-        console.log("user data", userData.user_id)
-        console.log("cardID", card_id)
+    const HandleAddToCard = async ()=> {
+        // console.log("Product", product.id)
+        // console.log("Product price", product.price)
+        // console.log("Product shipping", product.shipping_amount)
+        // console.log("sizeValue", sizeValue)
+        // console.log("color", colorValue)
+        // console.log("QtyValue", QtyValue)
+        // console.log("Country", currentAddress.country)
+        // console.log("user data", userData.user_id)
+        // console.log("cardID", card_id)
         
-    }
+    
 
+        try {
+            const Formdata = new FormData()
+
+            Formdata.append("product", product.id)
+            Formdata.append("user",  userData.user_id)
+            Formdata.append("qty", QtyValue)
+            Formdata.append("price", product.price)
+            Formdata.append("shipping_amount", product.shipping_amount)
+            Formdata.append("country", currentAddress.country)
+            Formdata.append("size",sizeValue)
+            Formdata.append("color", colorValue)
+            Formdata.append("cart_id", card_id)
+         
+            const response = await apiInstance.post("cart-view/", Formdata)
+            console.log(response)
+        } catch (error) {
+            console.log("erroro ocorrerer", error)
+            
+        }
+   
+    }
 
     const params = useParams()
 
