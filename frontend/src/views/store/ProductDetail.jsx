@@ -20,7 +20,7 @@ function ProductDetail() {
     const [QtyValue, SetQtyValue] = useState(1)
     const card_id = CartID()
 
-    console.log('card_id', card_id)
+    console.log('card_idiiiiiii', card_id)
     const userData = UserData()
     console.log(userData.user_id)
     

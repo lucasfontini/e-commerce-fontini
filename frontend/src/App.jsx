@@ -12,6 +12,8 @@ import Products from './views/store/Products'
 import './App.css'
 import Dashboard from './views/auths/Dashboard'
 import ProductDetail from './views/store/ProductDetail'
+import Cart from './views/store/Cart'
+import CheckOut from './views/store/CheckOut'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,6 +32,8 @@ function App() {
 
           <Route path='/' element={<Products />} />
           <Route path='/detail/:slug' element={<ProductDetail />} />
+          <Route path='/cart/' element={<Cart />} />
+          <Route path='/checkout/:order_oid/' element={<CheckOut />} />
 
         </Routes>
       </MainWrapper>

@@ -4,7 +4,17 @@ import { Link } from 'react-router-dom';
 import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UseData'
 import CartID from '../plugin/CartID'
+import swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
+
+const Toast = Swal.mixin({
+  Toast:true, 
+  position:"top",
+  showCancelButton:false,
+  timer:5000,
+  timerProgressBar:true
+})
 
 function Products() {
   const [products, setProducts] = useState([])
@@ -22,6 +32,8 @@ function Products() {
   const userData = UserData()
   const currentAddress = GetCurrentAddress()
   
+
+
 
   const HandleColorButtonClick = (event, product_id, colorName) => {
     SetcolorValue(colorName)
@@ -76,6 +88,10 @@ function Products() {
 
             const response = await apiInstance.post("cart-view/", Formdata)
             console.log(response)
+            Toast.fire({
+              icon:"success",
+              title:response.data.message
+            })
 
 
 

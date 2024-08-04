@@ -37,6 +37,7 @@ export const login = async (email, password) => {
         if (status === 200) {
             
             setAuthUser(data.access, data.refresh);
+            console.log("login ", data.access, data.refresh)
         }
 
         // Returning data and error information
@@ -126,15 +127,17 @@ export const setAuthUser = (access_token, refresh_token) => {
     Cookies.set('access_token', access_token, {
         expires: 1,  // Access token expires in 1 day
         secure: true,
-    });
+    }); 
 
     Cookies.set('refresh_token', refresh_token, {
         expires: 7,  // Refresh token expires in 7 days
         secure: true,
     });
+    console.log(Cookies.get('refresh_token'),"aaaaaaaaaaa")
 
     // Decoding access token to get user information
     const user = jwtDecode(access_token) ?? null;
+    console.log(user)
 
     // If user information is present, update user state; otherwise, set loading state to false
     if (user) {
@@ -147,10 +150,13 @@ export const setAuthUser = (access_token, refresh_token) => {
 export const getRefreshToken = async () => {
     // Retrieving refresh token from cookies and making a POST request to refresh the access token
     const refresh_token = Cookies.get('refresh_token');
+    console.log('refresh_token', refresh_token)
     const response = await axios.post('user/token/refresh/', {
         refresh: refresh_token,
+
     });
 
+    console.log('response', response)
     // Returning the refreshed access token
     return response.data;
 };

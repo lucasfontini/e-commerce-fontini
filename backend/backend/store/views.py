@@ -163,7 +163,7 @@ class CartApiView(generics.ListCreateAPIView):
             cart.cart_id = cart_id
 
             config_settings = ConfigSettings.objects.first()
-            
+            print("config_settings", config_settings)
             if config_settings.service_fee_charge_type == "percentage":
                 service_fee_percentage = config_settings.service_fee_percentage / 100 
                 cart.service_fee = Decimal(service_fee_percentage) * cart.sub_total
@@ -183,6 +183,7 @@ class CartListView(generics.ListAPIView):
     def get_queryset(self):
         cart_id = self.kwargs['cart_id']
         user_id = self.kwargs.get('user_id')  # Use get() method to handle the case where user_id is not present
+
 
         
         if user_id is not None:
@@ -304,6 +305,7 @@ class CartItemDeleteView(generics.DestroyAPIView):
         cart_id = self.kwargs['cart_id']
         item_id = self.kwargs['item_id']
         user_id = self.kwargs.get('user_id')
+        print(cart_id, item_id, user_id, "aaaaaaaaaaaa")
 
         if user_id is not None:
             user = get_object_or_404(User, id=user_id)
@@ -339,7 +341,11 @@ class CreateOrderView(generics.CreateAPIView):
         else:
             user = None
 
+
+        print("useer ===============", user)
         cart_items = Cart.objects.filter(cart_id=cart_id)
+        print("cart_items ===============", cart_items)
+
 
         total_shipping = Decimal(0.0)
         total_tax = Decimal(0.0)

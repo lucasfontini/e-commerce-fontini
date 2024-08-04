@@ -62,6 +62,7 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = '__all__'
 
+from django.utils.encoding import force_str
 
 # Define a serializer for the Product model
 class ProductSerializer(serializers.ModelSerializer):
@@ -118,7 +119,12 @@ class ProductSerializer(serializers.ModelSerializer):
             'order_count',
             "get_percentage",
         ]
-    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for key, value in representation.items():
+            if isinstance(value, str):
+                representation[key] = force_str(value)
+        return representation
     def __init__(self, *args, **kwargs):
         super(ProductSerializer, self).__init__(*args, **kwargs)
         # Customize serialization depth based on the request method.
@@ -129,6 +135,8 @@ class ProductSerializer(serializers.ModelSerializer):
         else:
             # For other methods, set serialization depth to 3.
             self.Meta.depth = 3
+
+
 
 
 
