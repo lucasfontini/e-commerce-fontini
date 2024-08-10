@@ -476,12 +476,14 @@ class StripeCheckoutView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         order_oid = self.kwargs['order_oid']
         order = CartOrder.objects.filter(oid=order_oid).first()
-
+        print("chegou aqui ")
         if not order:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
         try:
+            print("SITE_URLllllllllllllll", settings.SITE_URL)
+
             checkout_session = stripe.checkout.Session.create(
                 customer_email=order.email,
                 payment_method_types=['card'],
@@ -498,11 +500,13 @@ class StripeCheckoutView(generics.CreateAPIView):
                     }
                 ],
                 mode='payment',
-                # success_url = f"{settings.SITE_URL}/payment-success/{{order.oid}}/?session_id={{CHECKOUT_SESSION_ID}}",
-                # cancel_url = f"{settings.SITE_URL}/payment-success/{{order.oid}}/?session_id={{CHECKOUT_SESSION_ID}}",
+                
+                success_url = f"{settings.SITE_URL}/payment-success/{{order.oid}}/?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url = f"{settings.SITE_URL}/payment-success/{{order.oid}}/?session_id={{CHECKOUT_SESSION_ID}}",
+               
 
-                success_url=settings.SITE_URL+'/payment-success/'+ order.oid +'?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url=settings.SITE_URL+'/?session_id={CHECKOUT_SESSION_ID}',
+                # success_url=settings.SITE_URL+'/payment-success/'+ order.oid +'?session_id={CHECKOUT_SESSION_ID}',
+                # cancel_url=settings.SITE_URL+'/?session_id={CHECKOUT_SESSION_ID}',
             )
             order.stripe_session_id = checkout_session.id 
             order.save()

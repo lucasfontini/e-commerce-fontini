@@ -1,33 +1,39 @@
-import React, { useEffect, useState }  from 'react'
+import React, { useEffect, useState } from 'react'
 import apiInstance from '../../store/axios'
 import { Navigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2';
 
 
 const Toast = Swal.mixin({
-  Toast:true, 
-  position:"top",
-  showCancelButton:false,
-  timer:5000,
-  timerProgressBar:true
+    Toast: true,
+    position: "top",
+    showCancelButton: false,
+    timer: 5000,
+    timerProgressBar: true
 })
 function CheckOut() {
-    const [order , setorder] = useState([])
-    const [cupponcode , setcupponcode] = useState("")
+    const [order, setorder] = useState([])
+    const [cupponcode, setcupponcode] = useState("")
+    const [Payment, Setpayment] = useState(false)
     const param = useParams()
     const order_oid = param.order_oid
     console.log(order_oid)
 
 
+    const FetchOrder = () => {
+        apiInstance.get(`checkout/${order_oid}`).then((res) => {
+            setorder(res.data)
+        })
+    }
+
+
     useEffect(() => {
 
-      apiInstance.get(`checkout/${order_oid}`).then((res)=>{
-        setorder(res.data)
-      })
-      
-    },[])
+        FetchOrder()
 
-    const Applycuppon = async ()=>{
+    }, [])
+
+    const Applycuppon = async () => {
         console.log(cupponcode)
         console.log(order.oid)
 
@@ -38,20 +44,26 @@ function CheckOut() {
         try {
             const response = await apiInstance.post("coupon/", Formdata)
             Toast.fire({
-                icon:response.data.icon,
-                title:response.data.message
-              })
-  
+                icon: response.data.icon,
+                title: response.data.message
+            })
+            FetchOrder()
+
         } catch (error) {
             Toast.fire({
-                icon:"error",
-                title:error
-              })
-  
+                icon: "error",
+                title: error
+            })
+
         }
-        
+
     }
- 
+
+    const HandlePayment = (event) => {
+        event.target.form.submit()
+        Setpayment(true)
+
+    }
 
     return (
         <div>
@@ -193,21 +205,32 @@ function CheckOut() {
                                         </div>
 
                                         <div className="shadow p-3 d-flex mt-4 mb-4">
-                                            <input 
-                                             name="couponCode"
-                                              type="text" 
-                                              className='form-control' 
-                                              style={{ border: "dashed 1px gray" }} 
-                                              placeholder='Enter Coupon Code' 
-                                              id=""
-                                              onChange={(e)=>setcupponcode(e.target.value)}
-                                              />
-                                            <button onClick={Applycuppon}  className='btn btn-success ms-1'><i className='fas fa-check-circle'></i></button>
+                                            <input
+                                                name="couponCode"
+                                                type="text"
+                                                className='form-control'
+                                                style={{ border: "dashed 1px gray" }}
+                                                placeholder='Enter Coupon Code'
+                                                id=""
+                                                onChange={(e) => setcupponcode(e.target.value)}
+                                            />
+                                            <button onClick={Applycuppon} className='btn btn-success ms-1'><i className='fas fa-check-circle'></i></button>
                                         </div>
 
-                                        <form action={`http://127.0.0.1:8000/stripe-checkout/ORDER_ID/`} method='POST'>
-                                            <button type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Pay Now (Stripe)</button>
-                                        </form>
+                                        {Payment === true &&
+                                            <form action={`http://127.0.0.1:8000/api/v1/stripe-checkout/${order_oid}/`} method='POST'>
+                                                <button onClick={HandlePayment} type="submit" disabled className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Processing ... <i
+                                                    className='fas fa-spinner fa-spin'></i></button>
+                                            </form>
+                                        }
+
+
+                                        {Payment === false &&
+                                            <form action={`http://127.0.0.1:8000/api/v1/stripe-checkout/${order_oid}/`} method='POST'>
+                                                <button type="submit" className="btn btn-primary btn-rounded w-100 mt-2" style={{ backgroundColor: "#635BFF" }}>Pay Now <i
+                                                    className='fas fa-credit-card'></i></button>
+                                            </form>
+                                        }
 
                                         {/* <PayPalScriptProvider options={initialOptions}>
                                             <PayPalButtons className='mt-3'

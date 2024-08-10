@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import GetCurrentAddress from '../plugin/UserCountry'
 import UserData from '../plugin/UseData'
 import CartID from '../plugin/CartID'
-import swal from 'sweetalert2'
 import Swal from 'sweetalert2';
 
 

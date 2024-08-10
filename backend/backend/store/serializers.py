@@ -119,12 +119,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'order_count',
             "get_percentage",
         ]
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        for key, value in representation.items():
-            if isinstance(value, str):
-                representation[key] = force_str(value)
-        return representation
+        
     def __init__(self, *args, **kwargs):
         super(ProductSerializer, self).__init__(*args, **kwargs)
         # Customize serialization depth based on the request method.
